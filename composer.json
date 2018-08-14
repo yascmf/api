@@ -1,7 +1,7 @@
 {
-    "name": "laravel/lumen",
-    "description": "The Laravel Lumen Framework.",
-    "keywords": ["framework", "laravel", "lumen"],
+    "name": "yascmf/api",
+    "description": "YASCMF API Service based on Laravel/Lumen",
+    "keywords": ["yascmf", "api", "backend", "framework", "laravel", "lumen"],
     "license": "MIT",
     "type": "project",
     "require": {
