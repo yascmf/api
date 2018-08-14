@@ -99,4 +99,15 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
+$app->router->group([
+    'namespace' => 'Modules\Backend\Http\Controllers',
+], function ($router) {
+    require __DIR__.'/../routes/backend.php';
+});
+
+$app->router->group([
+    'namespace' => 'Modules\Frontend\Http\Controllers',
+], function ($router) {
+    require __DIR__.'/../routes/frontend.php';
+});
 return $app;
