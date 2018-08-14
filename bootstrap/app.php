@@ -110,4 +110,10 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/frontend.php';
 });
+
+$app->router->group([
+    'namespace' => 'Modules\Api\Http\Controllers',
+], function ($router) {
+    require __DIR__.'/../routes/api.php';
+});
 return $app;
