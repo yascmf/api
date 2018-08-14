@@ -9,7 +9,8 @@ git clone https://github.com/yascmf/api.git
 cd api
 cp .env.example .env
 vim .env
-// 修改相关配置，如数据库账号密码等
+// 修改相关配置，如APP_KEY,数据库账号密码等
+// APP_KEY 可以去 http://tool.c7sky.com/password/ 随机生成32位长度的字符串 配置上去
 composer install -vvv
 php -S 127.0.0.1:9999 -t public
 ```
