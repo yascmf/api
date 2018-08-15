@@ -4,7 +4,6 @@ namespace Modules\Api\Http\Controllers;
 
 
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use Modules\Api\Http\Controllers\BaseController;
 
 /**
