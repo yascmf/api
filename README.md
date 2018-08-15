@@ -2,7 +2,10 @@
 
 本项目处于WIP开发进行中，代码特性未稳定，请勿下载使用。基于 `Laravel/Lumen` 构建的API服务。
 
+
 ### 安装说明
+
+>   本项目基础数据库表结构兼容原 [yascmf/base](https://github.com/yascmf/base) 项目，提供迁移文件供新项目开发与迁移使用。
 
 ```bash
 git clone https://github.com/yascmf/api.git
@@ -12,6 +15,7 @@ vim .env
 // 修改相关配置，如APP_KEY,数据库账号密码等
 // APP_KEY 可以去 http://tool.c7sky.com/password/ 随机生成32位长度的字符串 配置上去
 composer install -vvv
+php artisan migrate
 php -S 127.0.0.1:9999 -t public
 ```
 
