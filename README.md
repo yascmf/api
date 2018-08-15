@@ -5,7 +5,11 @@
 
 ### 安装说明
 
->   本项目基础数据库表结构兼容原 [yascmf/base](https://github.com/yascmf/base) 项目，提供迁移文件供新项目开发与迁移使用。
+>   本项目基础数据库表结构兼容原 [yascmf/base](https://github.com/yascmf/base) 项目，提供迁移文件供新项目开发与迁移使用。在原有的 `base` 数据库表基础上，增加了以下表：
+
+- tags 标签表
+- article_tag_relation 文章与标签关系表
+
 
 ```bash
 git clone https://github.com/yascmf/api.git
