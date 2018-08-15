@@ -16,7 +16,7 @@ class CreateArticleTagRelationTable extends Migration
         Schema::create('article_tag_relation', function (Blueprint $table) {
             $table->integer('article_id')->unsigned();
             $table->integer('tag_id')->unsigned()->index('article_tag_relation_tag_id_foreign');
-            $table->primary(['article_id','tag_id']);
+            $table->primary(['article_id', 'tag_id']);
         });
     }
 
