@@ -4,7 +4,7 @@ namespace Modules\Api\Http\Controllers;
 
 use Illuminate\Routing\Controller;
 // use Illuminate\Http\Request;
-use Modules\Exception\ApiException;
+use Modules\Common\Exception\ApiException;
 // use Illuminate\Support\Facades\DB;
 // use Illuminate\Support\Facades\Log;
 
