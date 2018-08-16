@@ -13,7 +13,7 @@ class CreateSystemOptionsTable extends Migration
      */
     public function up()
     {
-        Schema::table('system_options', function (Blueprint $table) {
+        Schema::create('system_options', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 32)->unique('system_option_name_unique')->comment('配置选项名');
             $table->text('value', 65535)->nullable()->comment('配置选项值');

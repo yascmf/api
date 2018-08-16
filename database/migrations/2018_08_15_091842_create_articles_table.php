@@ -13,7 +13,7 @@ class CreateArticlesTable extends Migration
      */
     public function up()
     {
-        Schema::table('articles', function (Blueprint $table) {
+        Schema::create('articles', function (Blueprint $table) {
             $table->bigInteger('id', true)->unsigned();
             $table->string('title', 100)->nullable()->index('title')->comment('标题');
             $table->string('flag', 50)->nullable()->default('')->index('flag')->comment('推荐位');
