@@ -7,6 +7,7 @@
 
 >   本项目基础数据库表结构兼容原 [yascmf/base](https://github.com/yascmf/base) 项目，提供迁移文件供新项目开发与迁移使用。在原有的 `base` 数据库表基础上，增加了以下表：
 
+- members 会员表
 - tags 标签表
 - article_tag_relation 文章与标签关系表
 
@@ -20,6 +21,7 @@ vim .env
 // APP_KEY 可以去 http://tool.c7sky.com/password/ 随机生成32位长度的字符串 配置上去
 composer install -vvv
 php artisan migrate
+php artisan db:seed
 php -S 127.0.0.1:9999 -t public
 ```
 
