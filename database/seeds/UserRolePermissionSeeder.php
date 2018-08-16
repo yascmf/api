@@ -139,7 +139,7 @@ class UserRolePermissionSeeder extends Seeder
         ]);
 
         // 生成权限与角色对应关系
-        $permissions = DB::table('permissions')->all();
+        $permissions = DB::table('permissions')->get();
         $data = [];
         foreach ($permissions as $permission) {
             $data[] = [
