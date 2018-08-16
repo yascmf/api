@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePermissionTable extends Migration
+class CreateTagsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreatePermissionTable extends Migration
      */
     public function up()
     {
-        Schema::table('permissions', function (Blueprint $table) {
+        Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 50)->unique('permissions_name_unique');
-            $table->string('display_name', 100)->nullable();
-            $table->string('description')->nullable();
+            $table->string('name', 50)->comment('标签名称');
+            $table->string('description', 255)->comment('标签描述');
+            $table->bigInteger('ref_count')->default(0)->unsigned()->comment('被引用次数');
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreatePermissionTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('permissions');
+        Schema::dropIfExists('tags');
     }
 }

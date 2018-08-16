@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRoleTable extends Migration
+class CreateSystemOptionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,10 @@ class CreateRoleTable extends Migration
      */
     public function up()
     {
-        Schema::table('roles', function (Blueprint $table) {
+        Schema::table('system_options', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 40)->unique('roles_name_unique');
-            $table->string('display_name', 80)->nullable();
-            $table->string('description', 160)->nullable();
-            $table->timestamps();
+            $table->string('name', 32)->unique('system_option_name_unique')->comment('配置选项名');
+            $table->text('value', 65535)->nullable()->comment('配置选项值');
         });
     }
 
@@ -29,6 +27,6 @@ class CreateRoleTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('system_options');
     }
 }
