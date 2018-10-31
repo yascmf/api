@@ -33,7 +33,7 @@ class HomeController extends BaseController
                 return $this->api($result);
             }
         } else {
-            return $this->error('invaild identity-card number');
+            return $this->error('invalid identity-card number');
         }
     }
 
@@ -64,6 +64,6 @@ class HomeController extends BaseController
             }
             return $this->error('check your network and try later', 50001);
         }
-        return $this->error('invaild ipv4 address');
+        return $this->error('invalid ipv4 address');
     }
 }
