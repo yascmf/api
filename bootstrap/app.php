@@ -59,6 +59,10 @@ $app->singleton(
 |
 */
 
+$app->routeMiddleware([
+    'force-json' => App\Http\Middleware\ForceJson::class,
+]);
+
 // $app->middleware([
 //    App\Http\Middleware\ExampleMiddleware::class
 // ]);
@@ -78,6 +82,7 @@ $app->singleton(
 |
 */
 
+$app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);

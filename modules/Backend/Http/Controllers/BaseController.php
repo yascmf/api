@@ -20,7 +20,7 @@ class BaseController extends Controller
     {
         $json = [
             'code' => $code,
-            'msg' => $msg,
+            'message' => $msg,
             'data' => $data
         ];
         return response()->json($json);

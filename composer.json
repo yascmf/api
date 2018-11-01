@@ -9,7 +9,7 @@
         "laravel/lumen-framework": "5.5.*",
         "vlucas/phpdotenv": "~2.2",
         "illuminate/redis": "5.5.*",
-        "dingo/api": "1.0.*@dev",
+        "dingo/api": "2.0.0-alpha2",
         "guzzlehttp/guzzle": "^6.2",
         "douyasi/identity-card": "~2.0",
         "pda/pheanstalk": "~3.0"
