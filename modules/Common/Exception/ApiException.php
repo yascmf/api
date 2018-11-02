@@ -9,8 +9,7 @@ namespace Modules\Common\Exception;
  */
 class ApiException extends \Exception
 {
-    public static function getClass() 
-    {
+    public static function getClass(){
         return __CLASS__;
     }
 }

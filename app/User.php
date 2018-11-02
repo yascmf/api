@@ -12,6 +12,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 {
     use Authenticatable, Authorizable;
 
+    protected $storageKey = 'api_token';
+    protected $inputKey = 'api_token';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -29,4 +32,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
     ];
+
+    public function retrieveByCredentials($credentials)
+    {
+        $token = $credentials[$this->storageKey];
+
+    }
 }

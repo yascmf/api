@@ -23,9 +23,16 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
-// $app->withFacades();
+$app->withFacades();
 
-// $app->withEloquent();
+$app->withEloquent();
+
+$app->configure('third-party');
+
+// log daily
+$app->configureMonologUsing(function(Monolog\Logger $monolog) use ($app) {
+    return $monolog->pushHandler(new \Monolog\Handler\RotatingFileHandler($app->storagePath().'/logs/lumen.log'));
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -59,17 +66,15 @@ $app->singleton(
 |
 */
 
-$app->routeMiddleware([
-    'force-json' => App\Http\Middleware\ForceJson::class,
+$app->middleware([
+    // App\Http\Middleware\ExampleMiddleware::class,
+    App\Http\Middleware\RequestIdentifierMiddleware::class,
 ]);
 
-// $app->middleware([
-//    App\Http\Middleware\ExampleMiddleware::class
-// ]);
-
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+$app->routeMiddleware([
+    'auth' => App\Http\Middleware\Authenticate::class,
+    'force-json' => App\Http\Middleware\ForceJson::class,
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -84,7 +89,7 @@ $app->routeMiddleware([
 
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 // $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
 /*
@@ -104,11 +109,8 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
-$app->router->group([
-    'namespace' => 'Modules\Backend\Http\Controllers',
-], function ($router) {
-    require __DIR__.'/../routes/backend.php';
-});
+
+require __DIR__.'/../routes/backend.php';
 
 $app->router->group([
     'namespace' => 'Modules\Frontend\Http\Controllers',

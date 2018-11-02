@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\User;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -30,10 +32,28 @@ class AuthServiceProvider extends ServiceProvider
         // should return either a User instance or null. You're free to obtain
         // the User instance via an API token or any other method necessary.
 
+        /*
         $this->app['auth']->viaRequest('api', function ($request) {
             if ($request->input('api_token')) {
                 return User::where('api_token', $request->input('api_token'))->first();
             }
         });
+        */
+        
+        $this->app['auth']->viaRequest('api', function ($request) {
+            $token = $request->bearerToken();
+            if ($token) {
+                $key = config('third-party.api.login_token.prefix', 'api_token:').$token;
+                if ($cacheStr = Cache::get($key)) {
+                    list($type, $id) = explode(':', $cacheStr);
+                    if ($type == 'uid') {  // 后台管理型用户
+                        return User::find($id);
+                    } elseif ($type == 'mid') {  // 前台会员
+
+                    }
+                }
+            }
+        });
+        
     }
 }
