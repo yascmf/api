@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Modules\Common\Exception\LogicException;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -47,10 +48,17 @@ class AuthServiceProvider extends ServiceProvider
                 if ($cacheStr = Cache::get($key)) {
                     list($type, $id) = explode(':', $cacheStr);
                     if ($type == 'uid') {  // 后台管理型用户
-                        return User::find($id);
+                        $user = User::find($id);
+                        if ($user) {
+                            return $user;
+                        } else {
+                            throw new LogicException(LogicException::USER_NOT_FOUND);
+                        }
                     } elseif ($type == 'mid') {  // 前台会员
 
                     }
+                } else {
+                    throw new LogicException(LogicException::USER_NEED_LOGIN);
                 }
             }
         });

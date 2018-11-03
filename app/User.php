@@ -32,10 +32,5 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
     ];
-
-    public function retrieveByCredentials($credentials)
-    {
-        $token = $credentials[$this->storageKey];
-
-    }
+    
 }

@@ -5,14 +5,17 @@ $api = app('Dingo\Api\Routing\Router');
 $api->group([
     'namespace' => 'Modules\Backend\Http\Controllers',
     'version' => 'v1',
+    'middleware' => ['force-json'],
 ], function ($api) {
-
+    
     $api->group(['prefix' => 'auth'], function ($api) {
         $api->post('login', 'AuthController@postLogin');
     });
 
     $api->group(['middleware' => 'auth'],  function ($api) {
-        $api->get('user/profile', 'UserController@getProfile');
+        $api->get('user/info', 'UserController@getInfo');
+
+        $api->resource('article', 'ArticleController');
     });
     
 });

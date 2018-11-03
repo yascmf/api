@@ -57,7 +57,7 @@ class Handler extends ExceptionHandler
             return new JsonResponse($json, '404');
         }
         // 405 Method Not Allowed error
-        if ($exception instanceof MethodNotAllowedHttpException) {
+        if ($exception instanceof MethodNotAllowedHttpException && !$request->isMethod('OPTIONS')) {
             $json = [
                 'error' => '405 Method Not Allowed',
                 'error_description' => 'APP API Method Not Allowed',

@@ -69,6 +69,7 @@ $app->singleton(
 $app->middleware([
     // App\Http\Middleware\ExampleMiddleware::class,
     App\Http\Middleware\RequestIdentifierMiddleware::class,
+    App\Http\Middleware\Cors::class,
 ]);
 
 $app->routeMiddleware([
@@ -109,8 +110,11 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
-
-require __DIR__.'/../routes/backend.php';
+$app->router->group([
+    'namespace' => 'Modules\Backend\Http\Controllers',
+], function ($router) {
+    require __DIR__.'/../routes/backend.php';
+});
 
 $app->router->group([
     'namespace' => 'Modules\Frontend\Http\Controllers',
