@@ -5,11 +5,9 @@ namespace Modules\Backend\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Modules\Common\Exception\LogicException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use App\User;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 
 class ArticleController extends BaseController
@@ -18,6 +16,7 @@ class ArticleController extends BaseController
     public function __construct()
     {
         parent::__construct();
+
     }
 
     public function index(Request $request)
@@ -38,21 +37,14 @@ class ArticleController extends BaseController
         ];
     }
 
-    public function create()
+    public function store(Request $request)
     {
-        if (Gate::denies('article-write')) {
-            return deny();
-        }
-        $categories = Category::all();
-        return view('admin.back.article.create', compact('categories'));
-    }
-
-    public function store(ArticleRequest $request)
-    {
-        if (Gate::denies('article-write')) {
-            return deny();
+        if (Gate::denies('product-write')) {
+            throw new AccessDeniedHttpException('拒绝访问该接口');
         }
         $inputs = $request->all();
+        echo 'hello';
+        die();
         $article = new Article;
         $article->title = e($inputs['title']);
         $article->cid = intval($inputs['cid']);
@@ -78,11 +70,8 @@ class ArticleController extends BaseController
         }
     }
 
-    public function edit($id)
+    public function view($id)
     {
-        if (Gate::denies('article-write')) {
-            return deny();
-        }
         $article = Article::find($id);
         $categories = Category::all();
         is_null($article) AND abort(404);
@@ -91,8 +80,8 @@ class ArticleController extends BaseController
 
     public function update(ArticleRequest $request, $id)
     {
-        if (Gate::denies('article-write')) {
-            return deny();
+        if (Gate::denies('product-write')) {
+            throw new AccessDeniedHttpException('拒绝访问该接口');
         }
         $inputs = $request->all();
         $article = Article::find($id);

@@ -14,8 +14,15 @@ $api->group([
 
     $api->group(['middleware' => 'auth'],  function ($api) {
         $api->get('user/info', 'UserController@getInfo');
+        $api->resource('article', 'ArticleController', ['middleware' => 'can:@article']);
 
-        $api->resource('article', 'ArticleController');
+        /*
+        $api->get('article', ['middleware' => 'can:@article', 'uses' => 'ArticleController@index']);
+        $api->post('article', ['middleware' => 'can:article-write', 'uses' => 'ArticleController@store']);
+        $api->get('article/{id}', ['middleware' => 'can:@article', 'uses' => 'ArticleController@view']);
+        $api->put('article/{id}', ['middleware' => 'can:article-write', 'uses' => 'ArticleController@update']);
+        */
+
     });
-    
 });
+

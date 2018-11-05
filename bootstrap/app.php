@@ -75,6 +75,7 @@ $app->middleware([
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'force-json' => App\Http\Middleware\ForceJson::class,
+    'can' => \Illuminate\Auth\Middleware\Authorize::class,
 ]);
 
 /*
@@ -117,7 +118,7 @@ $app->router->group([
 });
 
 $app->router->group([
-    'namespace' => 'Modules\Frontend\Http\Controllers',
+    'namespace' => 'Modules\Backend\Http\Controllers',
 ], function ($router) {
     require __DIR__.'/../routes/frontend.php';
 });

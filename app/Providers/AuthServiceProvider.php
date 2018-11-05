@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Modules\Common\Exception\LogicException;
+use App\Permission;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -47,14 +48,20 @@ class AuthServiceProvider extends ServiceProvider
                 $key = config('third-party.api.login_token.prefix', 'api_token:').$token;
                 if ($cacheStr = Cache::get($key)) {
                     list($type, $id) = explode(':', $cacheStr);
-                    if ($type == 'uid') {  // 后台管理型用户
+                    if ($type === 'uid') {  // 后台管理型用户
                         $user = User::find($id);
+                        $permissions = Permission::with('roles')->get();
+                        foreach ($permissions as $permission) {
+                            Gate::define($permission->name, function ($user) use ($permission) {
+                                return $user->hasPermission($permission);
+                            });
+                        }
                         if ($user) {
                             return $user;
                         } else {
                             throw new LogicException(LogicException::USER_NOT_FOUND);
                         }
-                    } elseif ($type == 'mid') {  // 前台会员
+                    } elseif ($type === 'mid') {  // 前台会员
 
                     }
                 } else {
