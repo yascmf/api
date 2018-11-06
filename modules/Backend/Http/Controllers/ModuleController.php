@@ -65,7 +65,7 @@ class ModuleController extends BaseController
                     }
                 });
         }
-        if ($moduleConfig['index']['with']) {
+        if (isset($moduleConfig['index']['with']) && is_string($moduleConfig['index']['with']) && !empty($moduleConfig['index']['with'])) {
             $with = $moduleConfig['index']['with'];
             $query = $query->with($with);
         }
