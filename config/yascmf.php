@@ -1,7 +1,8 @@
 <?php
 
+// 带 * 为必填项，其它参考说明
 return [
-    'routers' => [
+    'routers' => [  // * 路由模块组名
         'article',
         'category',
         'tag',
@@ -11,7 +12,6 @@ return [
         'option',
         'log',
     ],
-    // 带 * 为必填项，其它参考说明
     'modules' => [
         'article' => [
             'title' => '文章',  // * 模块标题名
