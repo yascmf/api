@@ -28,6 +28,7 @@ $app->withFacades();
 $app->withEloquent();
 
 $app->configure('third-party');
+$app->configure('yascmf');
 
 // log daily
 $app->configureMonologUsing(function(Monolog\Logger $monolog) use ($app) {
@@ -89,6 +90,7 @@ $app->routeMiddleware([
 |
 */
 
+$app->register(Overtrue\LaravelLang\TranslationServiceProvider::class);
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 // $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
