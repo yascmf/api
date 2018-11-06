@@ -26,7 +26,7 @@ return [
                     's_cid' => ['cid', '{fieldValue}'],
                 ],
                 'with' => 'category:id,name',  // with关系 - 没有请注释掉或者设置值为 null
-                'orderBy' => null,  // 排序 - 没有请置为 null
+                'orderBy' => null,  // 排序 - 没有请设置值为 null
             ],
             'store' => [
                 'can' => 'article-write',
