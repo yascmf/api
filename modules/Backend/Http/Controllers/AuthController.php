@@ -22,7 +22,7 @@ class AuthController extends BaseController
      */
     public function postLogin(Request $request)
     {
-        // 认证凭证
+        // 凭证
         $username = $request->input('username');
         $password = $request->input('password');
         $user = User::where('username', $username)->first();
@@ -46,7 +46,7 @@ class AuthController extends BaseController
                 ];
             }
         } else {
-            // 登录失败，跳回
+            // 登录失败
             throw new LogicException(LogicException::USER_LOGIN_FAIL);
         }
     }

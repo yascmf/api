@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Modules\Common\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
@@ -29,6 +28,13 @@ class ModuleController extends BaseController
         
     }
 
+    /**
+     * index
+     *
+     * @param Request $request
+     * @param string $module
+     * @return array
+     */
     public function index(Request $request, $module)
     {
         $moduleConfig = $this->checkAction($module, 'index');
@@ -77,84 +83,64 @@ class ModuleController extends BaseController
 
     }
 
+    /**
+     * store
+     *
+     * @param Request $request
+     * @param string $module
+     * @return array
+     * @throws LogicException
+     */
     public function store(Request $request, $module)
     {
         $moduleConfig = $this->checkAction($module, 'store');
         $model = app($moduleConfig['model']);
-        $inputs = $request->all();
+        $inputs = $request->only($model->fillable);
         $rules = $model->rules();
         $messages = $model->messages();
-
-        $validator = Validator::make($inputs, $rules, $messages)->validate();
-        die();
+        $validator = Validator::make($inputs, $rules, $messages);
         if ($validator->fails()) {
-            throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, $validator->messages()->first());
+            $messages = $validator->messages()->first();
+            throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, $messages);
         }
         foreach ($inputs as $attr => $val) {
-            $model->$attr = e($val);
+            $model->$attr = $val;
         }
-        $article = new Article;
-        $article->title = e($inputs['title']);
-        $article->cid = intval($inputs['cid']);
-        $article->description = e($inputs['description']);
-        $article->content = $inputs['content'];
-        $article->slug = $inputs['slug'];
-        $article->thumb = empty($inputs['thumb']) ? '' : e($inputs['thumb']);
-        $tmp_flag = '';
-        /*这里需要对推荐位flag进行处理*/
-        if(!empty($inputs['flag']) && is_array($inputs['flag'])) {
-            foreach($inputs['flag'] as $flag)
-            {
-                if(!empty($flag)){
-                    $tmp_flag .= $flag.',';
-                }
-            }
-        }
-        $article->flag = $tmp_flag;
-        if($article->save()) {
-            return redirect()->to(site_path('article', 'admin'))->with('message', '成功撰写新文章！');
+        $model->save();
+        if ($model->save()) {
+            return [
+                'code' => LogicException::COMMON_SUCCESS,
+                'message' => 'ok',
+            ];
         } else {
-            return redirect()->back()->withInput($request->input())->with('fail', '数据库操作返回异常！');
+            throw new LogicException(LogicException::COMMON_DB_SAVE_FAIL);
         }
     }
 
-    public function view($id)
+    /**
+     * view
+     *
+     * @param Request $request
+     * @param string $module
+     * @param int $id
+     * @return array
+     */
+    public function view(Request $request, $module, $id)
     {
-        $article = Article::find($id);
-        $categories = Category::all();
-        is_null($article) AND abort(404);
-        return view('admin.back.article.edit', compact('article', 'categories'));
+        return [];
     }
 
-    public function update(ArticleRequest $request, $id)
+    /**
+     * update
+     *
+     * @param Request $request
+     * @param string $module
+     * @param int $id
+     * @return array
+     */
+    public function update(Request $request, $module, $id)
     {
-        if (Gate::denies('product-write')) {
-            throw new AccessDeniedHttpException('拒绝访问该接口');
-        }
-        $inputs = $request->all();
-        $article = Article::find($id);
-        $article->title = e($inputs['title']);
-        $article->cid = intval($inputs['cid']);
-        $article->description = e($inputs['description']);
-        $article->content = $inputs['content'];
-        $article->slug = $inputs['slug'];
-        $article->thumb = empty($inputs['thumb']) ? '' : e($inputs['thumb']);
-        $tmp_flag = '';
-        /*这里需要对推荐位flag进行处理*/
-        if(!empty($inputs['flag']) && is_array($inputs['flag'])) {
-            foreach($inputs['flag'] as $flag)
-            {
-                if(!empty($flag)){
-                    $tmp_flag .= $flag.',';
-                }
-            }
-        }
-        $article->flag = $tmp_flag;
-        if($article->save()) {
-            return redirect()->to(site_path('article', 'admin'))->with('message', '成功更新文章！');
-        } else {
-            return redirect()->back()->withInput($request->input())->with('fail', '数据库操作返回异常！');
-        }
+        return [];
     }
 
     private function checkAction($module, $action = 'index')
