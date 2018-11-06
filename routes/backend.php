@@ -15,7 +15,8 @@ $api->group([
     $api->group(['middleware' => 'auth'],  function ($api) {
         $api->get('module-config', 'ModuleController@getModuleConfig');
         $api->get('user/info', 'UserController@getInfo');
-        // $api->resource('article', 'ArticleController', ['middleware' => 'can:@article']);
+        // $api->resource('article', 'ArticleController', ['middleware' => 'can:@product']);
+
         $api->get('{module}', 'ModuleController@index');
         $api->post('{module}', 'ModuleController@store');
         $api->get('{module}/{id}', 'ModuleController@show');

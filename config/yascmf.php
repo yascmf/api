@@ -14,10 +14,26 @@ return [
     'modules' => [
         'article' => [
             'title' => '文章',
-            'can' => 'any:@article,store|update:article-write',
-            'action' => 'index,show,store,update',
+            'can' => '@article',
+            'actions' => 'index,show,store,update',
             'model' => Modules\Common\Models\Article::class,
             'table' => 'articles',
+            'index' => [
+                // 'can' => ''
+                'filters' => [
+                    's_title' => ['title', 'like', '%{fieldValue}%'],
+                    's_cid' => ['cid', '{fieldValue}'],
+                ],
+                'with' => 'category:id,name',
+                'orderBy' => null,
+            ],
+            'store' => [
+                'can' => 'article-write',
+                'save' => [
+                    'title' => 'e,trim',
+                    'flag' => '',
+                ],
+            ],
         ]
     ]
 ];

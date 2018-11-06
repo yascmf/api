@@ -25,7 +25,7 @@ class Article extends Model
 
     public function category()
     {
-        //模型名 外键 本键
+        // 模型名 外键 本键
         return $this->hasOne('Modules\Common\Models\Category', 'id', 'cid');
     }
 
@@ -40,7 +40,7 @@ class Article extends Model
         ];
     }
 
-    public function rules($filters)
+    public function rules($filters = [])
     {
         $id = isset($filters['id']) && !empty($filters['id']) ? ','.$filters['id'].',id' : '';
         $rules = [
@@ -62,6 +62,7 @@ class Article extends Model
     {
         return [
             'slug.regex' => ':attribute 非法',
+            'cid.*' => '分类id 非法',
         ];
     }
 

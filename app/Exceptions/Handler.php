@@ -8,9 +8,10 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Illuminate\Http\JsonResponse;
+//use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+//use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+//use Illuminate\Http\JsonResponse;
+//use Modules\Common\Exception\LogicException;
 
 class Handler extends ExceptionHandler
 {
@@ -48,22 +49,26 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        // 404  Not Found error
-        if ($exception instanceof NotFoundHttpException) {
-            $json = [
-                'error' => '404 Not Found',
-                'error_description' => 'APP API NOT FOUND',
-            ];
-            return new JsonResponse($json, '404');
-        }
-        // 405 Method Not Allowed error
-        if ($exception instanceof MethodNotAllowedHttpException && !$request->isMethod('OPTIONS')) {
-            $json = [
-                'error' => '405 Method Not Allowed',
-                'error_description' => 'APP API Method Not Allowed',
-            ];
-            return new JsonResponse($json, '405');
-        }
+//        // 404  Not Found error
+//        if ($exception instanceof NotFoundHttpException) {
+//            $json = [
+//                'message' => '404 Not Found',
+//                'errors' => 'App API NOT FOUND',
+//                'code' => LogicException::COMMON_NOT_FOUND,
+//                'status_code' => 404,
+//            ];
+//            return new JsonResponse($json, '404');
+//        }
+//        // 405 Method Not Allowed error
+//        if ($exception instanceof MethodNotAllowedHttpException /*&& !$request->isMethod('OPTIONS')*/) {
+//            $json = [
+//                'message' => '405 Method Not Allowed',
+//                'errors' => 'App API Method Not Allowed',
+//                'code' => LogicException::COMMON_METHOD_NOT_ALLOWED,
+//                'status_code' => 405,
+//            ];
+//            return new JsonResponse($json, '405');
+//        }
         return parent::render($request, $exception);
     }
 }

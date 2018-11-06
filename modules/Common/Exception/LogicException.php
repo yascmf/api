@@ -26,11 +26,14 @@ class LogicException extends \Exception
     /*20000 - 29999 用于存放非阻塞性、可读的、提示性或辅助性的错误及其文案*/
     const COMMON_SUCCESS                      = 20000;
     const COMMON_PARAMS_MISSING               = 20400;
-    const COMMON_VALIDATION_FAIL              = 20500;
+    const COMMON_VALIDATION_FAIL              = 20422;
     /*30000 - 39999 用于存放阻塞性、可写的、业务中断型的异常错误*/
     const COMMON_FAIL                         = 30000;
     const COMMON_DB_SAVE_FAIL                 = 30100;
     const COMMON_RECORD_NOT_FOUND             = 30400;
+    const COMMON_NOT_FOUND                    = 30404;
+    const COMMON_METHOD_NOT_ALLOWED           = 30405;
+    const COMMON_ACTION_NOT_ALLOWED           = 30501;
     // 20000 - 39999 区间异常code,仅供 `公共` 使用,其他模块请勿占用 END
 
 
@@ -51,6 +54,9 @@ class LogicException extends \Exception
         self::COMMON_FAIL                         => 'fail',
         self::COMMON_DB_SAVE_FAIL                 => 'database save failure',
         self::COMMON_RECORD_NOT_FOUND             => 'database record not found',
+        self::COMMON_METHOD_NOT_ALLOWED           => 'Method Not Allowed',
+        self::COMMON_NOT_FOUND                    => 'Not Found',
+        self::COMMON_ACTION_NOT_ALLOWED           => 'Action Not Allowed',
         // COMMON 20000 - 39999 END
 
 

@@ -9,6 +9,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
 
 
 class ModuleController extends BaseController
@@ -30,46 +31,68 @@ class ModuleController extends BaseController
 
     public function index(Request $request, $module)
     {
-        if (in_array($module, $this->routers)) {
-            if ($moduleConfig = $this->modules[$module]) {
-                $pageSize = ($request->input('page_size') > 0 && $request->input('page_size') <= 50) ? (int) $request->input('page_size') : 15;
-                $moduleItems = app($moduleConfig['model'])
-                    ->orderBy('created_at', 'desc')
-                    ->paginate($pageSize);
-                return [
-                    'item' => $moduleItems->items(),
-                    'total' => $moduleItems->total(),
-                ];
-            }
-        } else {
-            throw new NotFoundHttpException('404 Not Found!'); 
+        $moduleConfig = $this->checkAction($module, 'index');
+        $sData = $request->query();
+        $sData = array_filter($sData, function ($item) {
+            return !empty($item);
+        });
+        $pageSize = (isset($sData['page_size']) && ($sData['page_size'] > 0) && ($sData['page_size'] <= 50)) ? (int) $sData['page_size'] : 15;
+        $query = app($moduleConfig['model']);
+        if (is_array($moduleConfig['index']['filters']) && (count($moduleConfig['index']['filters']) > 0)) {
+            $filters = $moduleConfig['index']['filters'];
+            $query = $query->where(function ($query) use ($sData, $filters) {
+                    foreach ($filters as $sKey => $where) {
+                        if (is_array($where) && isset($sData[$sKey])) {
+                            switch (count($where)) {
+                                case 2:
+                                    $fieldValue = str_replace('{fieldValue}', $sData[$sKey], $where[1]);
+                                    $query->where($where[0], $fieldValue);
+                                    break;
+                                case 3:
+                                    $fieldValue = str_replace('{fieldValue}', $sData[$sKey], $where[2]);
+                                    $query->where($where[0], $where[1], $fieldValue);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                });
         }
-        /*
-        $s_title = $request->input('s_title');
-        $s_cid = $request->input('s_cid');
-
-        $categories = DB::table('categories')->get();
-        $articles = DB::table('articles')->where('title', 'like', '%'.$s_title.'%')
-            ->where('cid', (($s_cid > 0) ? '=' : '<>'), $s_cid)
-            ->orderBy('created_at','desc')
-            ->paginate(2);
-        $flags = config('ecms.flag.articles');
-        // return compact('categories', 'articles', 'flags');
+        if ($moduleConfig['index']['with']) {
+            $with = $moduleConfig['index']['with'];
+            $query = $query->with($with);
+        }
+        if (is_array($moduleConfig['index']['orderBy']) && (count($moduleConfig['index']['orderBy']) == 2)) {
+            $orderBy = $moduleConfig['index']['orderBy'];
+            $query->orderBy($orderBy[0], $orderBy[1]);
+        }
+        $moduleItems = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate($pageSize);
         return [
-            'items' => $articles->items(),
-            'total' => $articles->total(),
+            'items' => $moduleItems->items(),
+            'total' => $moduleItems->total(),
         ];
-        */
+
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $module)
     {
-        if (Gate::denies('product-write')) {
-            throw new AccessDeniedHttpException('拒绝访问该接口');
-        }
+        $moduleConfig = $this->checkAction($module, 'store');
+        $model = app($moduleConfig['model']);
         $inputs = $request->all();
-        echo 'hello';
+        $rules = $model->rules();
+        $messages = $model->messages();
+
+        $validator = Validator::make($inputs, $rules, $messages)->validate();
         die();
+        if ($validator->fails()) {
+            throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, $validator->messages()->first());
+        }
+        foreach ($inputs as $attr => $val) {
+            $model->$attr = e($val);
+        }
         $article = new Article;
         $article->title = e($inputs['title']);
         $article->cid = intval($inputs['cid']);
@@ -132,5 +155,37 @@ class ModuleController extends BaseController
         } else {
             return redirect()->back()->withInput($request->input())->with('fail', '数据库操作返回异常！');
         }
+    }
+
+    private function checkAction($module, $action = 'index')
+    {
+        if (!in_array($module, $this->routers)) {
+            throw new NotFoundHttpException('404 Not Found!');
+        }
+        if (isset($this->modules[$module])) {
+            $moduleConfig = $this->modules[$module];
+        } else {
+            throw new NotFoundHttpException('404 Not Found!');
+        }
+        $actions = explode(',', $moduleConfig['actions']);
+        if (!in_array($action, $actions)) {
+            throw new NotFoundHttpException('404 Not Found!');
+        }
+        $can = isset($moduleConfig['can']) ? $moduleConfig['can'] : null;
+        if (!isset($moduleConfig[$action])) {
+            throw new NotFoundHttpException('404 Not Found!');
+        }
+        $actionCan = isset($moduleConfig[$action]['can']) ? $moduleConfig[$action]['can'] : null;
+        if (is_string($can) && !empty($can)) {
+            if (Gate::denies($can)) {
+                throw new AccessDeniedHttpException('This action is unauthorized.');
+            }
+        }
+        if (is_string($actionCan) && !empty($actionCan)) {
+            if (Gate::denies($actionCan)) {
+                throw new AccessDeniedHttpException('This action is unauthorized.');
+            }
+        }
+        return $moduleConfig;
     }
 }

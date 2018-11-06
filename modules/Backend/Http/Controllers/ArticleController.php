@@ -8,6 +8,7 @@ use Modules\Common\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Modules\Common\Models\Article;
 
 
 class ArticleController extends BaseController
@@ -25,9 +26,11 @@ class ArticleController extends BaseController
         $s_cid = $request->input('s_cid');
 
         $categories = DB::table('categories')->get();
-        $articles = DB::table('articles')->where('title', 'like', '%'.$s_title.'%')
-            ->where('cid', (($s_cid > 0) ? '=' : '<>'), $s_cid)
+        $articles = Article::where('title', 'like', '%'.$s_title.'%')
+            //->where('cid', $s_cid)
+            ->with('category:id,name')
             ->orderBy('created_at','desc')
+            ->orderBy('id', 'asc')
             ->paginate(2);
         $flags = config('ecms.flag.articles');
         // return compact('categories', 'articles', 'flags');
