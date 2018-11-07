@@ -71,7 +71,7 @@ class ModuleController extends BaseController
         }
         if (is_array($moduleConfig['index']['orderBy']) && (count($moduleConfig['index']['orderBy']) == 2)) {
             $orderBy = $moduleConfig['index']['orderBy'];
-            $query->orderBy($orderBy[0], $orderBy[1]);
+            $query = $query->orderBy($orderBy[0], $orderBy[1]);
         }
         $moduleItems = $query
             ->orderBy('created_at', 'desc')
@@ -96,6 +96,9 @@ class ModuleController extends BaseController
         $moduleConfig = $this->checkAction($module, 'store');
         $model = app($moduleConfig['model']);
         $inputs = $request->only($model->fillable);
+        if (is_callable([$moduleConfig['model'], 'beforeSaving'])) {
+            $inputs = $model->beforeSaving($inputs);
+        }
         $rules = $model->rules();
         $messages = $model->messages();
         $validator = Validator::make($inputs, $rules, $messages);
@@ -106,7 +109,6 @@ class ModuleController extends BaseController
         foreach ($inputs as $attr => $val) {
             $model->$attr = $val;
         }
-        $model->save();
         if ($model->save()) {
             return [
                 'code' => LogicException::COMMON_SUCCESS,
@@ -118,16 +120,19 @@ class ModuleController extends BaseController
     }
 
     /**
-     * view
+     * show
      *
      * @param Request $request
      * @param string $module
      * @param int $id
      * @return array
      */
-    public function view(Request $request, $module, $id)
+    public function show(Request $request, $module, $id)
     {
-        return [];
+        $moduleConfig = $this->checkAction($module, 'store');
+        $model = app($moduleConfig['model']);
+        $model = $model->find($id);
+        return $model->toArray();
     }
 
     /**
@@ -137,12 +142,44 @@ class ModuleController extends BaseController
      * @param string $module
      * @param int $id
      * @return array
+     * @throws LogicException
      */
     public function update(Request $request, $module, $id)
     {
-        return [];
+        $moduleConfig = $this->checkAction($module, 'store');
+        $model = app($moduleConfig['model']);
+        $inputs = $request->only($model->fillable);
+        if (is_callable([$moduleConfig['model'], 'beforeSaving'])) {
+            $inputs = $model->beforeSaving($inputs);
+        }
+        $rules = $model->rules();
+        $messages = $model->messages();
+        $validator = Validator::make($inputs, $rules, $messages);
+        if ($validator->fails()) {
+            $messages = $validator->messages()->first();
+            throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, $messages);
+        }
+        $model = $model->find($id);
+        foreach ($inputs as $attr => $val) {
+            $model->$attr = $val;
+        }
+        if ($model->save()) {
+            return [
+                'code' => LogicException::COMMON_SUCCESS,
+                'message' => 'ok',
+            ];
+        } else {
+            throw new LogicException(LogicException::COMMON_DB_SAVE_FAIL);
+        }
     }
 
+    /**
+     * checkAction
+     * 
+     * @param string $module
+     * @param string $action
+     * @return mixed
+     */
     private function checkAction($module, $action = 'index')
     {
         if (!in_array($module, $this->routers)) {
@@ -154,13 +191,10 @@ class ModuleController extends BaseController
             throw new NotFoundHttpException('404 Not Found!');
         }
         $actions = explode(',', $moduleConfig['actions']);
-        if (!in_array($action, $actions)) {
+        if (!in_array($action, $actions) || !isset($moduleConfig[$action])) {
             throw new NotFoundHttpException('404 Not Found!');
         }
         $can = isset($moduleConfig['can']) ? $moduleConfig['can'] : null;
-        if (!isset($moduleConfig[$action])) {
-            throw new NotFoundHttpException('404 Not Found!');
-        }
         $actionCan = isset($moduleConfig[$action]['can']) ? $moduleConfig[$action]['can'] : null;
         if (is_string($can) && !empty($can)) {
             if (Gate::denies($can)) {

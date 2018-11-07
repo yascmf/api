@@ -26,14 +26,16 @@ return [
                     's_cid' => ['cid', '{fieldValue}'],
                 ],
                 'with' => 'category:id,name',  // with关系 - 没有请注释掉或者设置值为 null
-                'orderBy' => null,  // 排序 - 没有请设置值为 null
+                'orderBy' => null,  // 排序，已经有默认的 created_at desc 排序，无须再传入此排序 - 没有请设置值为 null
             ],
             'store' => [
                 'can' => 'article-write',
-                'save' => [
-                    'title' => 'e,trim',
-                    'flag' => '',
-                ],
+            ],
+            'show' => [
+                
+            ],
+            'update' => [
+                'can' => 'article-write',
             ],
         ],
         'category' => [
