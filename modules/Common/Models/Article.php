@@ -128,9 +128,5 @@ class Article extends Model
         $inputs['flag'] = $tmp_flag;
         return $inputs;
     }
-    
-    public function castAttribute($key, $value)
-    {
-    }
 
 }
