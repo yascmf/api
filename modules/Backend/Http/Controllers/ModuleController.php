@@ -95,9 +95,9 @@ class ModuleController extends BaseController
     {
         $moduleConfig = $this->checkAction($module, 'store');
         $model = app($moduleConfig['model']);
-        $inputs = $request->only($model->fillable);
-        if (is_callable([$moduleConfig['model'], 'beforeSaving'])) {
-            $inputs = $model->beforeSaving($inputs);
+        $inputs = $request->except(['id', 'created_at', 'updated_at', 'x-request-id']);
+        if (method_exists($model, 'beforeSaving')) {
+            $inputs = $model->beforeSaving($request);
         }
         $rules = $model->rules();
         $messages = $model->messages();
@@ -148,18 +148,18 @@ class ModuleController extends BaseController
     {
         $moduleConfig = $this->checkAction($module, 'store');
         $model = app($moduleConfig['model']);
-        $inputs = $request->only($model->fillable);
-        if (is_callable([$moduleConfig['model'], 'beforeSaving'])) {
-            $inputs = $model->beforeSaving($inputs);
+        $model = $model->find($id);
+        $inputs = $request->except(['id', 'created_at', 'updated_at', 'x-request-id']);
+        if (method_exists($model, 'beforeSaving')) {
+            $inputs = $model->beforeSaving($request);
         }
-        $rules = $model->rules();
+        $rules = $model->rules(['id' => $id]);
         $messages = $model->messages();
         $validator = Validator::make($inputs, $rules, $messages);
         if ($validator->fails()) {
             $messages = $validator->messages()->first();
             throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, $messages);
         }
-        $model = $model->find($id);
         foreach ($inputs as $attr => $val) {
             $model->$attr = $val;
         }

@@ -112,11 +112,12 @@ class Article extends Model
     /**
      * 保存前处理输入数据
      * 
-     * @param array $inputs
+     * @param \Illuminate\Http\Request $request
      * @return array
      */
-    public function beforeSaving($inputs)
+    public function beforeSaving($request)
     {
+        $inputs = $request->only($this->fillable);
         if (empty($inputs['thumb'])) {
             $inputs['thumb'] = '';
         }

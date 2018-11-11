@@ -51,10 +51,6 @@ return [
             ],
             'store' => [
                 'can' => 'category-write',
-                'save' => [
-                    'title' => 'e,trim',
-                    'flag' => '',
-                ],
             ],
         ]
     ]

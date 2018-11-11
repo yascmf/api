@@ -28,7 +28,7 @@ class Category extends Model
         ];
     }
     
-    public function rules($filters)
+    public function rules($filters = [])
     {
         $id = isset($filters['id']) && !empty($filters['id']) ? ','.$filters['id'].',id' : '';
         $rules = [
@@ -46,5 +46,4 @@ class Category extends Model
             'slug.regex' => ':attribute 不符合组合规则([a-z0-9\-_]{3,20})',
         ];
     }
-
 }
