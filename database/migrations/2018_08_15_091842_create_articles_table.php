@@ -20,6 +20,7 @@ class CreateArticlesTable extends Migration
             $table->string('thumb', 200)->nullable();
             $table->string('slug', 200)->nullable()->unique('content_slug_unique')->comment('网址缩略名，文章、单页与碎片模型有缩略名');
             $table->integer('cid')->unsigned()->nullable()->default(0)->comment('分类id：文章分类id不为0，单页与碎片分类id默认为0');
+            $table->tinyInteger('is_top')->default(0)->comment('是否置顶0否1是');
             $table->string('description')->nullable()->comment('内容摘要');
             $table->text('content', 65535)->comment('文章正文');
             $table->timestamps();

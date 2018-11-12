@@ -52,6 +52,21 @@ return [
             'store' => [
                 'can' => 'category-write',
             ],
+        ],
+        'tag' => [
+            'title' => '分类',
+            'can' => '@tag',
+            'actions' => 'index,show,store,update',
+            'model' => Modules\Common\Models\Tag::class,
+            'table' => 'categories',
+            'index' => [
+                // 'can' => ''
+                'filters' => [],
+                'orderBy' => null,
+            ],
+            'store' => [
+                'can' => 'tag-write',
+            ],
         ]
     ]
 ];
