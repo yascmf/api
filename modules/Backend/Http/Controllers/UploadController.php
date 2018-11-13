@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Cache;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 
 class UploadController extends BaseController
@@ -44,16 +43,13 @@ class UploadController extends BaseController
                 $oFile = $hash.'.'.$ext;
                 $fullFilename = '/'.$oFile;  //原始完整路径
                 if ($file->isValid()) {
-                    Storage::disk('qiniu')->put($oFile, fopen(request()->file, 'r'));
                     $uploadSuccess = $file->move($savePath, $oFile);  //移动文件
                     $oFilePath = $savePath.'/'.$oFile;
                     return [
                         'url' => $fullFilename
                     ];
                 } else {
-                    return [
-                        'url' => null
-                    ];
+                    throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, '文件校验失败');
                 }
             } else {
                 throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, $validator->messages()->first());
