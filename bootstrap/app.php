@@ -29,8 +29,6 @@ $app->withEloquent();
 
 $app->configure('third-party');
 $app->configure('yascmf');
-$app->configure('ocr');
-$app->configure('filesystems');
 
 // log daily
 $app->configureMonologUsing(function(Monolog\Logger $monolog) use ($app) {
