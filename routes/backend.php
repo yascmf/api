@@ -12,15 +12,16 @@ $api->group([
         $api->post('login', 'AuthController@postLogin');
     });
 
+    $api->post('upload/file', 'UploadController@postFile');
     $api->group(['middleware' => 'auth'],  function ($api) {
         $api->get('module-config', 'ModuleController@getModuleConfig');
         $api->get('user/info', 'UserController@getInfo');
-        // $api->resource('article', 'ArticleController', ['middleware' => 'can:@product']);
-
+        // $api->post('upload/file', 'UploadController@postFile');
         $api->get('{module}', 'ModuleController@index');
         $api->post('{module}', 'ModuleController@store');
         $api->get('{module}/{id}', 'ModuleController@show');
         $api->put('{module}/{id}', 'ModuleController@update');
+
     });
 });
 

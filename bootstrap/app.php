@@ -29,6 +29,8 @@ $app->withEloquent();
 
 $app->configure('third-party');
 $app->configure('yascmf');
+$app->configure('ocr');
+$app->configure('filesystems');
 
 // log daily
 $app->configureMonologUsing(function(Monolog\Logger $monolog) use ($app) {
@@ -95,6 +97,8 @@ $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
 // $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+// $app->register(Godruoyi\LaravelOCR\OCRServiceProvider::class);
+$app->register(Overtrue\LaravelFilesystem\Qiniu\QiniuStorageServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
