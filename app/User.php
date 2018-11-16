@@ -131,7 +131,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         } else {
             // store
             $rules = [
-                'username'                 => 'required|min:4|max:10|regex:/^[A-Za-z0-9]+$/|unique:users,username',
+                'username'                 => 'required|min:4|max:10|eng_alpha_dash/|unique:users,username',
                 'password'                 => 'required|min:6|max:16|regex:/^[a-zA-Z0-9~@#%_]{6,16}$/i',  //登录密码只能英文字母(a-zA-Z)、阿拉伯数字(0-9)、特殊符号(~@#%)
                 'password_confirmation'    => 'required|same:password',
                 'role'                     => 'required|exists:roles,id',
