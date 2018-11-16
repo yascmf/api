@@ -8,7 +8,6 @@
         "php": ">=7.0",
         "dingo/api": "2.0.0-alpha2",
         "douyasi/identity-card": "~2.0",
-        "godruoyi/laravel-ocr": "^1.1",
         "guzzlehttp/guzzle": "^6.2",
         "illuminate/redis": "5.5.*",
         "laravel/lumen-framework": "5.5.*",

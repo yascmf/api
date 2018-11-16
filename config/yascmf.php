@@ -11,6 +11,7 @@ return [
         'permission',
         'option',
         'log',
+        'topic',
     ],
     'modules' => [
         'article' => [
@@ -66,6 +67,21 @@ return [
             ],
             'store' => [
                 'can' => 'tag-write',
+            ],
+        ],
+        'user' => [
+            'title' => '管理用户',
+            'can' => '@user',
+            'actions' => 'index,show,store,update',
+            'model' => App\User::class,
+            'table' => 'users',
+            'index' => [
+                // 'can' => ''
+                'filters' => [],
+                'orderBy' => null,
+            ],
+            'store' => [
+                'can' => 'user-write',
             ],
         ]
     ]

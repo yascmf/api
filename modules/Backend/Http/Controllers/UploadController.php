@@ -18,6 +18,10 @@ class UploadController extends BaseController
 {
     /**
      * 上传文件接口
+     *
+     * @param Request $request
+     * @return array
+     * @throws LogicException
      */
     public function postFile(Request $request)
     {
