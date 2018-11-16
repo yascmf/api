@@ -44,7 +44,7 @@ class DouyasiValidator extends Validator
         return preg_match('/^[A-Z_]+$/', $value);
     }
 
-    /*验证手机号是否合法，使用正则判定，可能存在遗漏*/
+    /*验证手机号（仅限中国大陆地区）是否合法，使用正则判定，可能存在遗漏*/
     public function validateMobilePhone($attribute, $value)
     {
         /*
