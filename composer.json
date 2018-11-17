@@ -11,9 +11,11 @@
         "guzzlehttp/guzzle": "^6.2",
         "illuminate/redis": "5.5.*",
         "laravel/lumen-framework": "5.5.*",
+        "league/glide-laravel": "^1.0",
         "overtrue/laravel-filesystem-qiniu": "^1.0",
         "overtrue/laravel-lang": "~3.0",
         "pda/pheanstalk": "~3.0",
+        "ramsey/uuid": "^3.8",
         "vlucas/phpdotenv": "~2.2"
     },
     "require-dev": {

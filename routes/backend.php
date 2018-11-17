@@ -13,10 +13,12 @@ $api->group([
     });
 
     $api->post('upload/file', 'UploadController@postFile');
+
     $api->group(['middleware' => 'auth'],  function ($api) {
         $api->get('module-config', 'ModuleController@getModuleConfig');
-        $api->get('user/info', 'UserController@getInfo');
-        // $api->post('upload/file', 'UploadController@postFile');
+        $api->get('me/profile', ['middleware' => 'can:@me', 'uses' => 'MeController@getProfile']);
+        $api->post('me/profile', ['middleware' => 'can:me-write', 'uses' => 'MeController@postProfile']);
+        $api->post('me/logout', 'MeController@postLogout');
         $api->get('{module}', 'ModuleController@index');
         $api->post('{module}', 'ModuleController@store');
         $api->get('{module}/{id}', 'ModuleController@show');

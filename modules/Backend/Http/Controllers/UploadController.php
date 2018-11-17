@@ -5,14 +5,10 @@ namespace Modules\Backend\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 use Modules\Common\Exception\LogicException;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Cache;
-use App\User;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\DB;
+use Ramsey\Uuid\Uuid;
 
 class UploadController extends BaseController
 {
@@ -38,19 +34,68 @@ class UploadController extends BaseController
             ];
             $validator = Validator::make($data, $rules, $messages);
             if ($validator->passes()) {
-                $realPath = $file->getRealPath();
-                $hash = md5_file($realPath);
-                $savePath = storage_path('qiniu');
-                is_dir($savePath) || mkdir($savePath);  //如果不存在则创建目录
-                $name = $file->getClientOriginalName();
-                $ext = $file->getClientOriginalExtension();
-                $oFile = $hash.'.'.$ext;
-                $fullFilename = '/'.$oFile;  //原始完整路径
+                // 构建存储的文件夹规则，值如：uploads/images/avatars/201709/21/
+                // 文件夹切割能让查找效率更高。
+                $folder_name = "uploads/images/posts/" . date("Ym", time()) . '/'.date("d", time()).'/';
+                // 文件具体存储的物理路径，`public_path()` 获取的是 `public` 文件夹的物理路径。
+                $upload_path = base_path('public') . '/' . $folder_name;
+                /*
+                is_dir($upload_path) || mkdir($upload_path);  // 如果不存在则创建目录
+                */
+                // 获取文件的后缀名，因图片从剪贴板里黏贴时后缀名为空，所以此处确保后缀一直存在
+                $real_path = $file->getRealPath();
+                $extension = strtolower($file->getClientOriginalExtension()) ?: 'png';
+                $mime = strtolower($file->getMimeType());
+                $mimeArray = explode('/', $mime);
+                $type = isset($mimeArray[0]) ? $mimeArray[0] : 'unknown';
+
+                // 如果上传的不是图片将终止操作
+                if (! in_array($extension, ['png', 'gif', 'jpeg']) || ($type !== 'image')) {
+                    return false;
+                }
+                $uuid = Uuid::uuid4()->toString();
+                $hash = md5_file($real_path);
+                $size = $file->getSize();
+
+                // 使用md5值作为文件名，避免重复上传相同图片
+                $filename = $hash.'.'.$extension;
+                $local_path = $remote_path = '/'.$folder_name.''.$filename;
+
+                list($width, $height, $iType, $attr) = getimagesize($real_path);
+                unset($iType, $attr);
+
+                // 将图片移动到我们的目标存储路径中
                 if ($file->isValid()) {
-                    $uploadSuccess = $file->move($savePath, $oFile);  //移动文件
-                    $oFilePath = $savePath.'/'.$oFile;
+                    $file->move($upload_path, $filename);
+                    $time = date('Y-m-d H:i:s');
+                    DB::table('files')->insert([
+                        'id' => $uuid,
+                        'user_id' => Auth::guest() ? '0' : Auth::user()->id,
+                        'name' => $filename,
+                        'type' => $type,
+                        'extension' => $extension,
+                        'local_path' => $local_path,
+                        'driver_bucket' => 'qiniu.'.env('QINIU_BUCKET', '*'),
+                        'remote_path' => $local_path,
+                        'mime' => $mime,
+                        'original_name' => $file->getClientOriginalName() ?: str_random(6),
+                        'original_extension' => $extension,
+                        'original_mime' => $mime,
+                        'size' => $size,
+                        'width' => isset($width) ?: 0,
+                        'height' => isset($height) ?: 0,
+                        'duration' => 0,
+                        'bitrate' => 0,
+                        'meta' => '',
+                        'md5_hash' => $hash,
+                        'created_at' => $time,
+                        'updated_at' => $time,
+                        'state' => 0,
+                    ]);
                     return [
-                        'url' => $fullFilename
+                        'files' => [
+                            'file' => url('/file/'.$uuid),
+                        ],
                     ];
                 } else {
                     throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, '文件校验失败');
@@ -58,7 +103,6 @@ class UploadController extends BaseController
             } else {
                 throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, $validator->messages()->first());
             }
-
         } else {
             throw new LogicException(LogicException::COMMON_PARAMS_MISSING, '缺少待上传的文件');
         }

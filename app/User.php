@@ -63,11 +63,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     // 分配角色
     public function attachRole($role)
     {
-        if(is_object($role)) {
+        if (is_object($role)) {
             $role = $role->getKey();
         }
 
-        if(is_array($role)) {
+        if (is_array($role)) {
             $role = $role['id'];
         }
 
@@ -125,8 +125,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
                 'realname'              => 'required|min:2|max:5|regex:/^[\x{4e00}-\x{9fa5}]{2,5}$/u',  //中文正则匹配可能有遗漏
                 'password'              => 'min:6|max:16|regex:/^[a-zA-Z0-9~@#%_]{6,16}$/i',  //登录密码只能英文字母(a-zA-Z)、阿拉伯数字(0-9)、特殊符号(~@#%)
                 'password_confirmation' => 'same:password',
-                'role'                  => 'required|exists:roles,id',
-                'is_locked'             => 'required|boolean',
+                'role'                  => 'exists:roles,id',
+                'is_locked'             => 'boolean',
+                'phone'                 => 'required|size:11|mobile_phone|unique:users,phone',
             ];
         } else {
             // store
@@ -136,7 +137,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
                 'password_confirmation'    => 'required|same:password',
                 'role'                     => 'required|exists:roles,id',
                 'email'                    => 'required|email|unique:users,email',
-                'realname'                 => 'required|min:2|max:5|regex:/^[\x{4e00}-\x{9fa5}]{2,5}$/u',  //中文正则匹配可能有遗漏
+                'realname'                 => 'min:2|max:5|regex:/^[\x{4e00}-\x{9fa5}]{2,5}$/u',  //中文正则匹配可能有遗漏
                 'phone'                    => 'size:11|mobile_phone|unique:users,phone',
             ];
         }
@@ -151,12 +152,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             'nickname.min'        => '昵称过短，长度不得少于4',
             'nickname.max'        => '昵称过长，长度不得超出10',
 
-            'username.unique'        => '此登录名已存在，请尝试其它名字组合',
-            'username.required'      => '请填写登录名',
-            'username.max'           => '登录名过长，长度不得超出10',
-            'username.min'           => '登录名过短，长度不得少于4',
-            'username.regex'         => '登录名只能阿拉伯数字与英文字母组合',
-            'username.unique'        => '此登录名已存在，请尝试其它名字组合',
+            'username.unique'         => '此登录名已存在，请尝试其它名字组合',
+            'username.required'       => '请填写登录名',
+            'username.max'            => '登录名过长，长度不得超出10',
+            'username.min'            => '登录名过短，长度不得少于4',
+            'username.eng_alpha_dash' => '登录名只能阿拉伯数字与英文字母组合',
+            'username.unique'         => '此登录名已存在，请尝试其它名字组合',
 
             'password.required'              => '请填写登录密码',
             'password.min'                   => '密码长度不得少于6',
@@ -177,6 +178,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             'realname.max'      => '真实姓名字数不得多于5',
             'realname.regex'    => '真实姓名必须为中文',
 
+            'phone.required'     => '手机号码不能为空',
             'phone.size'         => '国内的手机号码长度为11位',
             'phone.mobile_phone' => '请填写合法的手机号码',
             'phone.unique'       => '此手机号码已存在于系统中，不能再进行二次关联',

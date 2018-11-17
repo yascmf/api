@@ -15,26 +15,5 @@ use Illuminate\Support\Facades\Auth;
 class UserController extends BaseController
 {
 
-    public function getInfo()
-    {
-        $user = Auth::user();
-        return [
-            'avatar' => 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-            'name' => $user->username,
-            'roles' => [
-                'admin'
-            ],
-            'permissions' => [
-
-            ],
-        ];
-    }
-
-    public function getProfile()
-    {
-        $user = Auth::user();
-        return [
-            'username' => $user->username,
-        ];
-    }
+    
 }

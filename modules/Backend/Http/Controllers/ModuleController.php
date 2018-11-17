@@ -42,7 +42,7 @@ class ModuleController extends BaseController
         $sData = array_filter($sData, function ($item) {
             return !empty($item);
         });
-        $pageSize = (isset($sData['page_size']) && ($sData['page_size'] > 0) && ($sData['page_size'] <= 50)) ? (int) $sData['page_size'] : 15;
+        $pageSize = (isset($sData['page_size']) && ($sData['page_size'] > 0) && ($sData['page_size'] <= 150)) ? (int) $sData['page_size'] : 15;
         $query = app($moduleConfig['model']);
         if (is_array($moduleConfig['index']['filters']) && (count($moduleConfig['index']['filters']) > 0)) {
             $filters = $moduleConfig['index']['filters'];

@@ -79,10 +79,38 @@ return [
                 // 'can' => ''
                 'filters' => [],
                 'orderBy' => null,
+                'with' => 'roles:id,name',  // with关系 - 没有请注释掉或者设置值为 null
             ],
             'store' => [
                 'can' => 'user-write',
             ],
-        ]
+        ],
+        'role' => [
+            'title' => '角色',
+            'can' => '@role',
+            'actions' => 'index,show,store,update',
+            'model' => App\Role::class,
+            'table' => 'roles',
+            'index' => [
+                // 'can' => ''
+                'filters' => [],
+                'orderBy' => null,
+            ],
+            'store' => [
+                'can' => 'role-write',
+            ],
+        ],
+        'permission' => [
+            'title' => '管理用户',
+            'can' => '@permission',
+            'actions' => 'index',
+            'model' => App\Permission::class,
+            'table' => 'permissions',
+            'index' => [
+                // 'can' => ''
+                'filters' => [],
+                'orderBy' => null,
+            ]
+        ],
     ]
 ];
