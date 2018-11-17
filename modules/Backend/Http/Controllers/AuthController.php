@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use App\User;
 use Carbon\Carbon;
+use Modules\Common\SystemLogger;
 
 
 class AuthController extends BaseController
@@ -37,6 +38,13 @@ class AuthController extends BaseController
                 $token = base64_encode(str_random(40));
                 $key = $prefix.''.$token;
                 Cache::put($key, 'uid:'.$user->id, $expiredTime);
+                SystemLogger::write([
+                    'user_id' => $user->id,
+                    'type' => 'session',
+                    'url' => $request->url(),
+                    'operator_ip' => $request->ip(),
+                    'content' => '[API_LOGIN]username:'.$user->username,
+                ]);
                 return [
                     'access_token' => $token,
                     'uid' => $user->id,

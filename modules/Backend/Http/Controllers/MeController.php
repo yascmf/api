@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use App\User;
+use Modules\Common\SystemLogger;
 
 
 class MeController extends BaseController
@@ -77,10 +78,19 @@ class MeController extends BaseController
      */
     public function postLogout(Request $request)
     {
+
         $token = $request->bearerToken();
         if ($token) {
+            SystemLogger::write([
+                'user_id' => Auth::guest() ? '0' : Auth::user()->id,
+                'type' => 'session',
+                'url' => $request->url(),
+                'operator_ip' => $request->ip(),
+                'content' => '[API_LOGOUT]access_token:'.$token,
+            ]);
             $key = config('third-party.api.login_token.prefix', 'api_token:') . $token;
             Cache::forget($key);
+
         }
         return [
             'code' => LogicException::COMMON_SUCCESS,

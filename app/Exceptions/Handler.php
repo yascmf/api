@@ -69,6 +69,7 @@ class Handler extends ExceptionHandler
 //            ];
 //            return new JsonResponse($json, '405');
 //        }
+
         return parent::render($request, $exception);
     }
 }
