@@ -5,8 +5,6 @@ namespace Modules\Common\Providers;
 use Illuminate\Support\ServiceProvider;
 use Modules\Common\Extensions\DouyasiValidator;
 
-// use Validator;
-
 /**
  * DouyasiValidator 扩展自定义验证类 服务提供者
  *
@@ -24,12 +22,6 @@ class DouyasiServiceProvider extends ServiceProvider
     {
         //
         /*注册自定义验证类*/
-        /*
-        Validator::resolver(function($translator, $data, $rules, $messages)
-        {
-            return new DouyasiValidator($translator, $data, $rules, $messages);
-        });
-        */
         $this->app['validator']->resolver(function ($translator, $data, $rules, $messages) {
             return new DouyasiValidator($translator, $data, $rules, $messages);
         });
