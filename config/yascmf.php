@@ -101,7 +101,7 @@ return [
             ],
         ],
         'permission' => [
-            'title' => '管理用户',
+            'title' => '权限',
             'can' => '@permission',
             'actions' => 'index',
             'model' => App\Permission::class,
