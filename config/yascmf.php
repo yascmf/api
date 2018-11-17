@@ -11,7 +11,6 @@ return [
         'permission',
         'option',
         'log',
-        'topic',
     ],
     'modules' => [
         'article' => [
