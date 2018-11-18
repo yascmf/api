@@ -80,6 +80,9 @@ return [
                 'orderBy' => null,
                 'with' => 'roles:id,name',  // with关系 - 没有请注释掉或者设置值为 null
             ],
+            'show' => [
+                'with' => 'roles:id,name',
+            ],
             'store' => [
                 'can' => 'user-write',
             ],
@@ -93,7 +96,10 @@ return [
             'index' => [
                 // 'can' => ''
                 'filters' => [],
-                'orderBy' => null,
+                'orderBy' => ['id', 'asc'],
+            ],
+            'show' => [
+                'with' => 'perms:id,name'
             ],
             'store' => [
                 'can' => 'role-write',

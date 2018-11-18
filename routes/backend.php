@@ -16,7 +16,7 @@ $api->group([
 
     $api->group(['middleware' => 'auth'],  function ($api) {
         $api->get('module-config', 'ModuleController@getModuleConfig');
-        $api->get('me/profile', ['middleware' => 'can:@me', 'uses' => 'MeController@getProfile']);
+        $api->get('me/profile', 'MeController@getProfile');
         $api->post('me/profile', ['middleware' => 'can:me-write', 'uses' => 'MeController@postProfile']);
         $api->post('me/logout', 'MeController@postLogout');
         $api->get('{module}', 'ModuleController@index');

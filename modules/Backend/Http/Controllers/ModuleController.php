@@ -71,10 +71,14 @@ class ModuleController extends BaseController
         }
         if (is_array($moduleConfig['index']['orderBy']) && (count($moduleConfig['index']['orderBy']) == 2)) {
             $orderBy = $moduleConfig['index']['orderBy'];
-            $query = $query->orderBy($orderBy[0], $orderBy[1]);
+            if ($orderBy[0] !== 'id') {
+                $query = $query->orderBy($orderBy[0], $orderBy[1])
+                    ->orderBy('id', 'desc');
+            } else {
+                $query = $query->orderBy($orderBy[0], $orderBy[1]);
+            }
         }
         $moduleItems = $query
-            ->orderBy('created_at', 'desc')
             ->paginate($pageSize);
         return [
             'items' => $moduleItems->items(),
@@ -96,9 +100,6 @@ class ModuleController extends BaseController
         $moduleConfig = $this->checkAction($module, 'store');
         $model = app($moduleConfig['model']);
         $inputs = $request->except(['id', 'created_at', 'updated_at', 'x-request-id']);
-        if (method_exists($model, 'beforeSaving')) {
-            $inputs = $model->beforeSaving($request);
-        }
         $rules = $model->rules();
         $messages = $model->messages();
         $validator = Validator::make($inputs, $rules, $messages);
@@ -106,10 +107,16 @@ class ModuleController extends BaseController
             $messages = $validator->messages()->first();
             throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, $messages);
         }
+        if (method_exists($model, 'beforeSaving')) {
+            $inputs = $model->beforeSaving($request);
+        }
         foreach ($inputs as $attr => $val) {
             $model->$attr = $val;
         }
         if ($model->save()) {
+            if (method_exists($model, 'afterSaving')) {
+                $model->afterSaving($model, $request);
+            }
             return [
                 'code' => LogicException::COMMON_SUCCESS,
                 'message' => 'ok',
@@ -130,8 +137,12 @@ class ModuleController extends BaseController
     public function show(Request $request, $module, $id)
     {
         $moduleConfig = $this->checkAction($module, 'store');
-        $model = app($moduleConfig['model']);
-        $model = $model->find($id);
+        $query = app($moduleConfig['model']);
+        if (isset($moduleConfig['show']['with']) && is_string($moduleConfig['show']['with']) && !empty($moduleConfig['show']['with'])) {
+            $with = $moduleConfig['show']['with'];
+            $query = $query->with($with);
+        }
+        $model = $query->find($id);
         return $model->toArray();
     }
 
@@ -150,9 +161,6 @@ class ModuleController extends BaseController
         $model = app($moduleConfig['model']);
         $model = $model->find($id);
         $inputs = $request->except(['id', 'created_at', 'updated_at', 'x-request-id']);
-        if (method_exists($model, 'beforeSaving')) {
-            $inputs = $model->beforeSaving($request);
-        }
         $rules = $model->rules(['id' => $id]);
         $messages = $model->messages();
         $validator = Validator::make($inputs, $rules, $messages);
@@ -160,10 +168,16 @@ class ModuleController extends BaseController
             $messages = $validator->messages()->first();
             throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, $messages);
         }
+        if (method_exists($model, 'beforeSaving')) {
+            $inputs = $model->beforeSaving($request);
+        }
         foreach ($inputs as $attr => $val) {
             $model->$attr = $val;
         }
         if ($model->save()) {
+            if (method_exists($model, 'afterSaving')) {
+                $model->afterSaving($model, $request);
+            }
             return [
                 'code' => LogicException::COMMON_SUCCESS,
                 'message' => 'ok',

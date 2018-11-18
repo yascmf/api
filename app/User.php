@@ -7,6 +7,7 @@ use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
@@ -119,20 +120,21 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function rules($filters = [])
     {
         if (isset($filters['id'])) {
+            $id = $filters['id'] ? ','.$filters['id'].',id' : '';
             // update
             $rules = [
-                'nickname'              => 'required|alpha_dash|min:4|max:10',
+                'nickname'              => 'required|alpha_dash|min:2|max:10',
                 'realname'              => 'required|min:2|max:5|regex:/^[\x{4e00}-\x{9fa5}]{2,5}$/u',  //中文正则匹配可能有遗漏
                 'password'              => 'min:6|max:16|regex:/^[a-zA-Z0-9~@#%_]{6,16}$/i',  //登录密码只能英文字母(a-zA-Z)、阿拉伯数字(0-9)、特殊符号(~@#%)
                 'password_confirmation' => 'same:password',
                 'role'                  => 'exists:roles,id',
                 'is_locked'             => 'boolean',
-                'phone'                 => 'required|size:11|mobile_phone|unique:users,phone',
+                'phone'                 => 'required|size:11|mobile_phone|unique:users,phone'.$id,
             ];
         } else {
             // store
             $rules = [
-                'username'                 => 'required|min:4|max:10|eng_alpha_dash/|unique:users,username',
+                'username'                 => 'required|min:4|max:10|eng_alpha_dash|unique:users,username',
                 'password'                 => 'required|min:6|max:16|regex:/^[a-zA-Z0-9~@#%_]{6,16}$/i',  //登录密码只能英文字母(a-zA-Z)、阿拉伯数字(0-9)、特殊符号(~@#%)
                 'password_confirmation'    => 'required|same:password',
                 'role'                     => 'required|exists:roles,id',
@@ -149,13 +151,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         return [
             'nickname.required'   => '请填写昵称',
             'nickname.alpha_dash' => '昵称包含特殊字符',
-            'nickname.min'        => '昵称过短，长度不得少于4',
+            'nickname.min'        => '昵称过短，长度不得少于2',
             'nickname.max'        => '昵称过长，长度不得超出10',
 
             'username.unique'         => '此登录名已存在，请尝试其它名字组合',
             'username.required'       => '请填写登录名',
             'username.max'            => '登录名过长，长度不得超出10',
-            'username.min'            => '登录名过短，长度不得少于4',
+            'username.min'            => '登录名过短，长度不得少于5',
             'username.eng_alpha_dash' => '登录名只能阿拉伯数字与英文字母组合',
             'username.unique'         => '此登录名已存在，请尝试其它名字组合',
 
@@ -186,5 +188,47 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             'is_locked.required' => '请选择用户状态',
             'is_locked.boolean'  => '用户状态必须为布尔值',
         ];
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        // 如果值的长度等于 60，即认为是已经做过加密的情况
+        if (strlen($value) != 60) {
+
+            // 不等于 60，做密码加密处理
+            $value = Hash::make($value);
+        }
+
+        $this->attributes['password'] = $value;
+    }
+
+    public function beforeSaving($request)
+    {
+        $inputs = $request->only($this->fillable);
+        return $inputs;
+    }
+
+    public function afterSaving($mangerModel, $request)
+    {
+        $role = $request->input('role');
+        if ($role) {
+            // 确保一个管理员只拥有一个角色
+            $roles = $mangerModel->roles;
+            if ($roles->isEmpty()) {  // 判断角色结果集是否为空
+                $mangerModel->roles()->attach($role);  // 空角色，则直接同步角色
+            } else {
+                if (is_array($roles)) {
+                    // 如果为对象数组，则表明该管理用户拥有多个角色
+                    // 则删除多个角色，再同步新的角色
+                    $mangerModel->detachRoles($roles);
+                    $mangerModel->roles()->attach($role);  // 同步角色
+                } else {
+                    if ($roles->first()->id !== $role) {
+                        $mangerModel->detachRole($roles->first());
+                        $mangerModel->roles()->attach($role);  // 同步角色
+                    }
+                }
+            }
+        }
     }
 }
