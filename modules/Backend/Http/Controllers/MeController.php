@@ -44,6 +44,10 @@ class MeController extends BaseController
 
     /**
      * 更新当前用户资料
+     *
+     * @param Request $request
+     * @return array
+     * @throws LogicException
      */
     public function postProfile(Request $request)
     {
@@ -75,6 +79,9 @@ class MeController extends BaseController
 
     /**
      * 登出
+     * 
+     * @param Request $request
+     * @return array
      */
     public function postLogout(Request $request)
     {
