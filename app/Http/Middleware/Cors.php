@@ -26,11 +26,11 @@ class Cors
             'Access-Control-Allow-Credentials' => 'true',
             'Access-Control-Allow-Headers'     => 'Content-Type, Authorization, X-Requested-With, Origin, X-Auth-Token, App-Version, App-Root-Key',
         ];
-        if ($request->isMethod('OPTIONS')) {
-            return response()->json('', 204, $headers);
-        }
         if (is_array($allowedOrigins) && (count($allowedOrigins) > 0) && in_array($origin, $allowedOrigins)) {
             $headers['Access-Control-Allow-Origin'] = $origin;
+        }
+        if ($request->isMethod('OPTIONS')) {
+            return response()->json('', 204, $headers);
         }
         return $next($request)->withHeaders($headers);
     }
