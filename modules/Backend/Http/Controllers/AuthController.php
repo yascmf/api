@@ -18,6 +18,7 @@ class AuthController extends BaseController
      * postLogin
      * 登录
      *
+     * @param Request $request
      * @return array
      * @throws LogicException
      */
