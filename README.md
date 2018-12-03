@@ -19,6 +19,14 @@ cp .env.example .env
 vim .env
 // 修改相关配置，如APP_KEY,数据库账号密码等
 // APP_KEY 可以去 http://tool.c7sky.com/password/ 随机生成32位长度的字符串 配置上去
+
+// 生产环境请将下面值设置成如下合适的值
+# APP_DEBUG=false
+# API_DEBUG=false
+// 不清楚 CORS 请参考 http://www.ruanyifeng.com/blog/2016/04/cors.html
+// admin.yascmf.com 与 localhost:9528 为 `yascmf/admin` 运行时绑定的域名
+# set ACCESS_CONTROL_ALLOW_ORIGIN to your own CROS allowed domains (explode by ',') in production environment, such as
+# ACCESS_CONTROL_ALLOW_ORIGIN='https://admin.yascmf.com,http://localhost:9528'
 composer install -vvv
 php artisan migrate
 php artisan db:seed
