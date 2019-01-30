@@ -15,4 +15,5 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+$router->post('upload/file', 'UploadController@postFile');
 $router->get('file/{id}', 'FileController@show');

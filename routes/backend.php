@@ -12,8 +12,6 @@ $api->group([
         $api->post('login', 'AuthController@postLogin');
     });
 
-    $api->post('upload/file', 'UploadController@postFile');
-
     $api->group(['middleware' => 'auth'],  function ($api) {
         $api->get('module-config', 'ModuleController@getModuleConfig');
         $api->get('me/profile', 'MeController@getProfile');

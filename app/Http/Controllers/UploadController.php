@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Backend\Http\Controllers;
+namespace App\Http\Controllers;
 
 
 use Illuminate\Http\Request;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
-class UploadController extends BaseController
+class UploadController extends Controller
 {
     /**
      * 上传文件接口
@@ -50,8 +50,8 @@ class UploadController extends BaseController
                 $type = isset($mimeArray[0]) ? $mimeArray[0] : 'unknown';
 
                 // 如果上传的不是图片将终止操作
-                if (! in_array($extension, ['png', 'gif', 'jpeg']) || ($type !== 'image')) {
-                    return false;
+                if (! in_array($extension, ['png', 'gif', 'jpeg', 'jpg']) || ($type !== 'image')) {
+                    throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, '不允许上传该类型的文件');
                 }
                 $uuid = Uuid::uuid4()->toString();
                 $hash = md5_file($real_path);
@@ -67,6 +67,10 @@ class UploadController extends BaseController
                 // 将图片移动到我们的目标存储路径中
                 if ($file->isValid()) {
                     $file->move($upload_path, $filename);
+                    $meta = [
+                        'width' => isset($width) ?: 0,
+                        'height' => isset($height) ?: 0,
+                    ];
                     $time = date('Y-m-d H:i:s');
                     DB::table('files')->insert([
                         'id' => $uuid,
@@ -74,29 +78,22 @@ class UploadController extends BaseController
                         'name' => $filename,
                         'type' => $type,
                         'extension' => $extension,
-                        'local_path' => $local_path,
-                        'driver_bucket' => 'qiniu.'.env('QINIU_BUCKET', '*'),
-                        'remote_path' => $local_path,
+                        'path' => $local_path,
                         'mime' => $mime,
                         'original_name' => $file->getClientOriginalName() ?: str_random(6),
                         'original_extension' => $extension,
                         'original_mime' => $mime,
                         'size' => $size,
-                        'width' => isset($width) ?: 0,
-                        'height' => isset($height) ?: 0,
-                        'duration' => 0,
-                        'bitrate' => 0,
-                        'meta' => '',
+                        'meta' => json_encode($meta),
                         'md5_hash' => $hash,
                         'created_at' => $time,
                         'updated_at' => $time,
-                        'state' => 0,
                     ]);
-                    return [
+                    return response()->json([
                         'files' => [
                             'file' => url('/file/'.$uuid),
                         ],
-                    ];
+                    ]);
                 } else {
                     throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, '文件校验失败');
                 }
