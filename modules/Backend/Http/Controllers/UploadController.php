@@ -89,11 +89,11 @@ class UploadController extends BaseController
                         'created_at' => $time,
                         'updated_at' => $time,
                     ]);
-                    return response()->json([
+                    return [
                         'files' => [
                             'file' => url('/file/'.$uuid),
                         ],
-                    ]);
+                    ];
                 } else {
                     throw new LogicException(LogicException::COMMON_VALIDATION_FAIL, '文件校验失败');
                 }
